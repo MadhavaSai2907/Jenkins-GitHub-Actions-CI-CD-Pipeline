@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = "flask-app"
+      MONGO_URI = "mongodb://localhost:27017/testdb"
     }
 
     stages {
