@@ -1,132 +1,301 @@
-# Student Registration System
+# Task-1 : Jenkins CI/CD Pipeline for Flask Application
 
-A simple **Flask** web application to manage student records with **MongoDB** as the backend database. Users can **add, view, update, and delete** student details.
+## Objective
+
+This project demonstrates a complete CI/CD pipeline using Jenkins for a Python Flask web application. The pipeline automates the process of building, testing, and deploying the application whenever changes are pushed to the repository.
 
 ---
 
-## Features
+## Project Overview
 
-* List all students on the home page
-* Add a new student
-* Update existing student details
-* Delete a student with confirmation
-* Simple and responsive UI using Bootstrap
+A Jenkins pipeline is configured to:
+
+* Automatically trigger on code changes (GitHub webhook)
+* Install dependencies
+* Run unit tests using pytest
+* Deploy the Flask application
+* Send email notifications on success/failure
 
 ---
 
 ## Tech Stack
 
-* **Backend:** Python, Flask
-* **Database:** MongoDB (via Flask-PyMongo)
-* **Frontend:** HTML, Jinja2 templates, Bootstrap 5
-* **Environment Variables:** Managed via `.env` file
+* Python (Flask)
+* Jenkins
+* GitHub
+* Pytest
+* MongoDB (for application data)
+* Gmail SMTP (for notifications)
 
 ---
 
-## Setup Instructions
+## Prerequisites
 
-### 1. Clone the repository
+Ensure the following are installed:
 
-```bash
-git clone <your-repo-url>
-cd <repo-folder>
-```
+* Python 3.x
+* pip
+* Jenkins (running on EC2/Linux)
+* Git
+* MongoDB (running locally on port 27017)
 
-### 2. Create and activate a virtual environment
+---
 
-```bash
-python -m venv venv
-# Activate venv
-# Windows:
-venv\Scripts\activate
-# Linux / Mac:
-source venv/bin/activate
-```
+## Jenkins Setup
 
-### 3. Install dependencies
+1. Install Jenkins on a Linux/EC2 instance
+2. Install required plugins:
 
-```bash
-pip install -r requirements.txt
-```
-
-**`requirements.txt` example:**
-
-```
-Flask
-Flask-PyMongo
-python-dotenv
-bson
-```
-
-### 4. Configure environment variables
-
-Create a `.env` file in the project root:
-
-```
-MONGO_URI=<your-mongodb-connection-string>
-SECRET_KEY=<your-secret-key>
-```
-
-### 5. Run the application
-
-```bash
-python app.py
-```
-
-Open your browser at: [http://localhost:8000](http://localhost:8000)
+   * Pipeline
+   * Git
+   * GitHub Integration
+   * Email Extension Plugin
+3. Configure Python and Git in Jenkins
+4. Configure SMTP for email notifications using Gmail App Password
 
 ---
 
 ## Project Structure
 
 ```
-project/
-│
-├── templates/
-│   ├── base.html
-│   ├── index.html
-│   ├── add_student.html
-│   ├── update_student.html
-│
+.
 ├── app.py
 ├── requirements.txt
-└── .env
+├── test_app.py
+├── Jenkinsfile
+├── templates/
+└── README.md
 ```
 
 ---
 
-## Screenshots
+## CI/CD Pipeline Stages
 
-**Home Page**
-Lists all students with Edit/Delete buttons.
-- <img width="1902" height="607" alt="image" src="https://github.com/user-attachments/assets/a58a6a6d-4978-4769-8074-232e4d31e69d" />
+### 1. Build Stage
+
+* Creates a virtual environment
+* Installs dependencies from `requirements.txt`
+
+### 2. Test Stage
+
+* Executes unit tests using pytest
+* Ensures application stability before deployment
+
+### 3. Deploy Stage
+
+* Runs the Flask application
+* Application starts using:
+
+  ```
+  nohup python app.py &
+  ```
+
+---
+
+## GitHub Webhook Integration
+
+* Configured webhook to trigger Jenkins pipeline automatically
+* URL used:
+
+  ```
+  http://<public-ip>:8080/github-webhook/
+  ```
+* Trigger condition: Push to `main` branch
+
+---
+
+## Email Notification Setup
+
+* Configured using Gmail SMTP:
+
+  * SMTP Server: smtp.gmail.com
+  * Port: 587
+  * TLS: Enabled
+  * Authentication: App Password
+
+  NOTE: App password can be generated through 
+  
+  ```https://myaccount.google.com/apppasswords```
+
+  <img width="1624" height="843" alt="image" src="https://github.com/user-attachments/assets/5546ac03-c89a-4b4f-b017-8e6deb465058" />
 
 
-**Add Student**
-Form to add a new student.
-- <img width="1897" height="801" alt="image" src="https://github.com/user-attachments/assets/d65d25c3-ebb5-410a-adb1-e130ad7c5878" />
+* Pipeline sends:
 
+  * Success email on successful build
+  * Failure email on build failure
+  
+<img width="695" height="313" alt="image" src="https://github.com/user-attachments/assets/26f919e6-1818-4560-acce-cfdb739c3240" />
 
-**Update Student**
-Form pre-filled with student details.
-- <img width="1905" height="897" alt="image" src="https://github.com/user-attachments/assets/04febf01-879f-431f-ab07-abcfb993acf1" />
+---
+
+## How to Run
+
+1. Push code to GitHub repository
+2. Jenkins automatically triggers pipeline
+3. Pipeline executes:
+
+   * Build → Test → Deploy
+4. Email notification is sent with build status
+
+---
+
+# Task-2 : Flask CI/CD Pipeline using GitHub Actions
+
+## Overview
+
+This project demonstrates a complete CI/CD pipeline for a Flask application using GitHub Actions. The pipeline automates testing, building, and deployment to staging and production environments.
+
+---
+
+## Tech Stack
+
+* Python (Flask)
+* Pytest (Testing)
+* GitHub Actions (CI/CD)
+* MongoDB (via Flask-PyMongo)
+
+---
+
+##  Branch Strategy
+
+| Branch    | Purpose                |
+| --------- | ---------------------- |
+| `main`    | Production environment |
+| `staging` | Pre-production testing |
+
+---
+
+## CI/CD Workflow
+
+The pipeline is defined in:
+
+```
+.github/workflows/ci-cd.yml
+```
+
+### Workflow Triggers
+
+| Action                | Trigger                     |
+| --------------------- | --------------------------- |
+| CI (Build & Test)     | Push to `main` or `staging` |
+| Staging Deployment    | Push to `staging` branch    |
+| Production Deployment | Create a GitHub Release     |
+
+---
+
+## Workflow Steps
+
+### 1. Install Dependencies
+
+* Installs required Python packages using `pip`
+
+### 2. Run Tests
+
+* Executes test cases using `pytest`
+
+### 3. Build
+
+* Prepares the application after successful tests
+
+### 4. Deploy to Staging
+
+* Triggered when code is pushed to `staging`
+
+### 5. Deploy to Production
+
+* Triggered when a release is created
+
+---
+
+## GitHub Secrets
+
+Configured under:
+
+**Settings → Secrets → Actions**
+
+| Secret Name       | Purpose           |
+| ----------------- | ----------------- |
+| `STAGING_HOST`    | Staging server    |
+| `STAGING_USER`    | SSH user          |
+| `STAGING_SSH_KEY` | SSH private key   |
+| `PROD_HOST`       | Production server |
+| `PROD_USER`       | SSH user          |
+| `PROD_SSH_KEY`    | SSH private key   |
+
+>  Dummy values can be used for demonstration.
+
+---
+
+## Running Tests Locally
+
+```bash
+pip install -r requirements.txt
+pytest
+```
+
+---
+
+## How to Trigger Pipeline
+
+### Staging Deployment
+
+```bash
+git checkout staging
+git push origin staging
+```
+
+---
+
+### Production Deployment
+
+1. Go to **GitHub → Releases**
+2. Click **Create new release**
+3. Add:
+
+   * Tag: `v1.0`
+   * Title: `First Release`
+4. Click **Publish release**
+
+---
+
+## Workflow Screenshots
+
+### CI Pipeline Success
 
 
 
 ---
 
-## Notes
+###  Staging Deployment
 
-* Make sure MongoDB is running and accessible via the URI in `.env`
-* Delete action includes a confirmation page to prevent accidental deletion
-* Uses `ObjectId` from `bson` to work with MongoDB document IDs
-* If you use MongoDB Atlas on macOS, install dependencies again (`pip install -r requirements.txt`). This project now uses `certifi` CA bundle explicitly to avoid common TLS certificate verification failures with `pymongo`.
+<img width="1880" height="691" alt="image" src="https://github.com/user-attachments/assets/b062f379-e74e-4244-a4c5-eda6b8e08eca" />
+
 
 ---
 
-## License
+###  Production Deployment
 
-MIT License
+<img width="1533" height="773" alt="image" src="https://github.com/user-attachments/assets/d5af37a7-f638-4ecc-93bf-cb17edd2d49c" />
+
+
+---
+
+##  Project Structure
+
+```
+project/
+│
+├── app.py
+├── requirements.txt
+├── tests/
+│   └── test_app.py
+├── templates/
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml
+└── README.md
+```
 
 ---
 
